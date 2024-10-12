@@ -13,13 +13,31 @@
       <!--侧边栏-->
       <el-aside width="200px">Aside</el-aside>
       <!--右侧内容主题-->
-      <el-main>Main</el-main>
+      <el-main>
+        <div class="img-show">
+          <!--图片轮播-->
+          <el-carousel indicator-position="outside"  style="width: 100%;">
+            <el-carousel-item v-for="item in imgArray" :key="item">
+              <img :src="item" class="rightImg">
+            </el-carousel-item>
+          </el-carousel>
+        </div>
+      </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      imgArray: [
+        require('../assets/img/1.png'),
+        require('../assets/img/2.png'),
+        require('../assets/img/3.png')
+      ]
+    }
+  },
   methods: {
     logout() {
       window.sessionStorage.clear()
@@ -60,10 +78,30 @@ export default {
   }
 
   .img-container img {
-    width: 10%;
+    width: 5%;
     height: auto;
     border-radius: 50%;
     overflow: hidden;
+  }
+
+  .rightImg {
+    width: 100%;
+    height: 540px;
+  }
+  .el-carousel__item h3 {
+    color: #475669;
+    font-size: 18px;
+    opacity: 0.75;
+    line-height: 300px;
+    margin: 0;
+  }
+
+  .el-carousel__item:nth-child(2n) {
+    background-color: #99a9bf;
+  }
+
+  .el-carousel__item:nth-child(2n+1) {
+    background-color: #d3dce6;
   }
 
 </style>
