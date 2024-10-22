@@ -10,10 +10,10 @@
     </el-header>
     <!--页面主题区域-->
     <el-container>
-      <!--侧边栏-->
+      <!--侧边栏 :router="true"属性开启路由  -->
       <el-aside :width="isCollapse ? '64px' : '200px'">
         <div class="toggle-button" @click="toggleCollapse">|||</div>
-        <el-menu background-color="#000080" text-color="#fff" active-text-color="#ffd04b" :unique-opened='true' :collapse="isCollapse" :collapse-transition="false">
+        <el-menu background-color="#000080" text-color="#fff" active-text-color="#ffd04b" :unique-opened='true' :collapse="isCollapse" :collapse-transition="false" :router="true">
           <!-- 一级菜单 -->
           <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
             <!-- 一级菜单模板区域 -->
@@ -23,7 +23,7 @@
               <span>{{ item.authName }}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item :index="subItem.id + ''" v-for="subItem in item.children" :key="subItem.id">
+            <el-menu-item :index="'/' + subItem.path" v-for="subItem in item.children" :key="subItem.id">
               <template slot="title">
                 <!--图标-->
                 <i class="el-icon-menu"></i>
@@ -43,6 +43,8 @@
             </el-carousel-item>
           </el-carousel>
         </div>
+        <!-- 路由占位符-->
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
