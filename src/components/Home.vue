@@ -11,7 +11,28 @@
     <!--页面主题区域-->
     <el-container>
       <!--侧边栏-->
-      <el-aside width="200px">Aside</el-aside>
+      <el-aside :width="isCollapse ? '64px' : '200px'">
+        <div class="toggle-button" @click="toggleCollapse">|||</div>
+        <el-menu background-color="#000080" text-color="#fff" active-text-color="#ffd04b" :unique-opened='true' :collapse="isCollapse" :collapse-transition="false">
+          <!-- 一级菜单 -->
+          <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
+            <!-- 一级菜单模板区域 -->
+            <template slot="title">
+              <!--图标-->
+              <i :class="iconsObj[item.id]"></i>
+              <span>{{ item.authName }}</span>
+            </template>
+            <!-- 二级菜单 -->
+            <el-menu-item :index="subItem.id + ''" v-for="subItem in item.children" :key="subItem.id">
+              <template slot="title">
+                <!--图标-->
+                <i class="el-icon-menu"></i>
+                <span>{{ subItem.authName }}</span>
+              </template>
+            </el-menu-item>
+          </el-submenu>
+        </el-menu>
+      </el-aside>
       <!--右侧内容主题-->
       <el-main>
         <div class="img-show">
@@ -29,19 +50,43 @@
 
 <script>
 export default {
+  created() {
+    this.getMenuList()
+  },
   data() {
     return {
       imgArray: [
         require('../assets/img/1.png'),
         require('../assets/img/2.png'),
         require('../assets/img/3.png')
-      ]
+      ],
+      // 左侧菜单数据
+      menuList: [],
+      iconsObj: {
+        125: 'iconfont icon-user',
+        103: 'iconfont icon-tijikongjian',
+        101: 'iconfont icon-shangpin',
+        102: 'iconfont icon-danju',
+        145: 'iconfont icon-baobiao'
+      },
+      // 菜单是否折叠
+      isCollapse: false
     }
   },
   methods: {
     logout() {
       window.sessionStorage.clear()
       this.$router.push('login')
+    },
+    async getMenuList() {
+      const { data: res } = await this.$http.get('menus')
+      console.log(res)
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      this.menuList = res.data
+    },
+    // 菜单的折叠与展开
+    toggleCollapse() {
+      this.isCollapse = !this.isCollapse
     }
   }
 }
@@ -71,6 +116,9 @@ export default {
 
   .el-aside {
     background-color: #8eb3b7;
+    .el-menu {
+      border-right: none;
+    }
   }
 
   .el-main {
@@ -102,6 +150,20 @@ export default {
 
   .el-carousel__item:nth-child(2n+1) {
     background-color: #d3dce6;
+  }
+
+  .iconfont {
+    margin-right: 10px;
+  }
+
+  .toggle-button {
+    background-color: #6495ED;
+    font-size: 10px;
+    line-height: 24px;
+    color: #fff;
+    text-align: center;
+    letter-spacing: 0.2em;
+    cursor: pointer;
   }
 
 </style>
