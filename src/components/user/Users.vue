@@ -11,13 +11,22 @@
     <el-card class="box-card">
       <el-row :gutter="15">
         <el-col :span="7">
-          <!--搜索与添加-->
-          <el-input placeholder="请输入内容">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+          <!--搜索与添加 clearable:清空输入，@clear：触发清空事件-->
+          <el-input
+            placeholder="请输入内容"
+            v-model="queryInfo.query"
+            clearable
+            @clear="getUserList"
+          >
+            <el-button
+              slot="append"
+              icon="el-icon-search"
+              @click="getUserList"
+            ></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary">添加用户</el-button>
+          <el-button type="primary" @click="addDialogVisible = true">添加用户</el-button>
         </el-col>
       </el-row>
       <!--用户列表区域-->
@@ -30,29 +39,115 @@
         <el-table-column label="状态">
           <!-- scope:作用域插槽 -->
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.mg_state"></el-switch>
+            <el-switch
+              v-model="scope.row.mg_state"
+              @change="userStateChanged(scope.row)"
+            ></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="{}">
-            <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
-            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
-            <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+            ></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+            ></el-button>
+            <el-tooltip
+              effect="dark"
+              content="分配角色"
+              placement="top"
+              :enterable="false"
+            >
+              <el-button
+                type="warning"
+                icon="el-icon-setting"
+                size="mini"
+              ></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
       <!--分页区域-->
-      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[1, 2, 5, 10]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="queryInfo.pagenum"
+        :page-sizes="[1, 2, 5, 10]"
+        :page-size="queryInfo.pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      >
       </el-pagination>
     </el-card>
+    <!--添加用户对话框-->
+    <el-dialog
+      title="添加用户"
+      :visible.sync="addDialogVisible"
+      width="50%">
+      <!--内容主体-->
+      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="addForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="addForm.password"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="addForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="addForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <!--底部-->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 export default {
   data() {
+    // 自定义校验规则：验证邮箱的规则
+    var checkEmail = (rule, value, cb) => {
+      const regEmail = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/
+      if (regEmail.test(value)) {
+        return cb()
+      }
+      return cb(new Error('请输入合法的邮箱'))
+    }
+    // 自定义校验规则：验证手机号的规则
+    var checkMobile = (rule, value, cb) => {
+      if (!value) {
+        return new Error('请输入电话号码')
+      } else {
+        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+        const isPhone = reg.test(value)
+        // 转换为数字
+        value = Number(value)
+        // 判断是否为数字
+        if (typeof value === 'number' && !isNaN(value)) {
+          // 转换成字符串
+          value = value.toString()
+          // 判断是否为11位手机号
+          if (value.length < 0 || value.length > 12 || !isPhone) {
+            cb(new Error('手机号码格式如:138xxxx8966'))
+          } else {
+            cb()
+          }
+        } else {
+          cb(new Error('请输入电话号码'))
+        }
+      }
+    }
     return {
       // 获取用户列表的参数对象
       queryInfo: {
@@ -61,7 +156,35 @@ export default {
         pagesize: 2
       },
       userList: [],
-      total: 0
+      total: 0,
+      // 控制添加用户对话框的显示和隐藏
+      addDialogVisible: false,
+      // 添加用户的表单数据
+      addForm: {
+        username: '',
+        password: '',
+        email: '',
+        mobile: ''
+      },
+      // 添加表单的验证规则对象
+      addFormRules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 10, message: '用户名长度在3~10个字符之间', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 15, message: '密码长度在6~15个字符之间', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
+        ],
+        mobile: [
+          { required: true, message: '请输入手机号', trigger: 'blur' },
+          { validator: checkMobile, trigger: 'blur' }
+        ]
+      }
     }
   },
   created() {
@@ -69,9 +192,13 @@ export default {
   },
   methods: {
     async getUserList() {
-      const { data: res } = await this.$http.get('users', { params: this.queryInfo })
+      const { data: res } = await this.$http.get('users', {
+        params: this.queryInfo
+      })
       // console.log(res)
-      if (res.meta.status !== 200) return this.$message.error('获取用户列表失败.')
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取用户列表失败.')
+      }
       this.userList = res.data.users
       this.total = res.data.total
     },
@@ -86,11 +213,20 @@ export default {
       // console.log(newPage)
       this.queryInfo.pagenum = newPage
       this.getUserList()
+    },
+    // 用户状态变更
+    async userStateChanged(userInfo) {
+      const { data: res } = await this.$http.put(
+        `users/${userInfo.id}/state/${userInfo.mg_state}`
+      )
+      if (res.meta.status !== 200) {
+        userInfo.mg_state = !userInfo.mg_state
+        return this.$message.error('更新用户状态失败.')
+      }
+      return this.$message.success('更新用户状态成功.')
     }
   }
 }
 </script>
 
-<style lang="less" scoped>
-
-</style>
+<style lang="less" scoped></style>
