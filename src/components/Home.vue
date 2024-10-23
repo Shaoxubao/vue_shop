@@ -3,7 +3,7 @@
     <!-- 头部区域 -->
     <el-header>
       <div class="img-container">
-        <img src="../assets/R.png" alt="">
+        <img src="../assets/R.png" alt="" />
         <span>电商后台管理系统</span>
       </div>
       <el-button type="info" @click="logout">退出</el-button>
@@ -13,9 +13,22 @@
       <!--侧边栏 :router="true"属性开启路由  -->
       <el-aside :width="isCollapse ? '64px' : '200px'">
         <div class="toggle-button" @click="toggleCollapse">|||</div>
-        <el-menu background-color="#000080" text-color="#fff" active-text-color="#ffd04b" :unique-opened='true' :collapse="isCollapse" :collapse-transition="false" :router="true" :default-active="activePath">
+        <el-menu
+          background-color="#000080"
+          text-color="#fff"
+          active-text-color="#ffd04b"
+          :unique-opened="true"
+          :collapse="isCollapse"
+          :collapse-transition="false"
+          :router="true"
+          :default-active="activePath"
+        >
           <!-- 一级菜单 -->
-          <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
+          <el-submenu
+            :index="item.id + ''"
+            v-for="item in menuList"
+            :key="item.id"
+          >
             <!-- 一级菜单模板区域 -->
             <template slot="title">
               <!--图标-->
@@ -23,7 +36,12 @@
               <span>{{ item.authName }}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item :index="'/' + subItem.path" v-for="subItem in item.children" :key="subItem.id" @click="saveNevState('/' + subItem.path)">
+            <el-menu-item
+              :index="'/' + subItem.path"
+              v-for="subItem in item.children"
+              :key="subItem.id"
+              @click="saveNevState('/' + subItem.path)"
+            >
               <template slot="title">
                 <!--图标-->
                 <i class="el-icon-menu"></i>
@@ -37,9 +55,9 @@
       <el-main>
         <div class="img-show">
           <!--图片轮播-->
-          <el-carousel indicator-position="outside"  style="width: 100%;">
+          <el-carousel indicator-position="outside" style="width: 100%">
             <el-carousel-item v-for="item in imgArray" :key="item">
-              <img :src="item" class="rightImg">
+              <img :src="item" class="rightImg" />
             </el-carousel-item>
           </el-carousel>
         </div>
@@ -103,77 +121,76 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .home-container {
-    height: 100%;
-  }
+.home-container {
+  height: 100%;
+}
 
-  .el-header {
-    background-color: #7AC5CD;
+.el-header {
+  background-color: #7ac5cd;
+  display: flex;
+  justify-content: space-between;
+  padding-left: 0;
+  align-items: center;
+  color: #fff;
+  font-size: 20px;
+  > div {
     display: flex;
-    justify-content: space-between;
-    padding-left: 0;
     align-items: center;
-    color: #fff;
-    font-size: 20px;
-    > div {
-      display: flex;
-      align-items: center;
-      span {
-        margin-left: 15px;
-      }
+    span {
+      margin-left: 15px;
     }
   }
+}
 
-  .el-aside {
-    background-color: #8eb3b7;
-    .el-menu {
-      border-right: none;
-    }
+.el-aside {
+  background-color: #8eb3b7;
+  .el-menu {
+    border-right: none;
   }
+}
 
-  .el-main {
-    background-color: #F0FFF0;
-  }
+.el-main {
+  background-color: #f0fff0;
+}
 
-  .img-container img {
-    width: 5%;
-    height: auto;
-    border-radius: 50%;
-    overflow: hidden;
-  }
+.img-container img {
+  width: 5%;
+  height: auto;
+  border-radius: 50%;
+  overflow: hidden;
+}
 
-  .rightImg {
-    width: 100%;
-    height: 540px;
-  }
-  .el-carousel__item h3 {
-    color: #475669;
-    font-size: 18px;
-    opacity: 0.75;
-    line-height: 300px;
-    margin: 0;
-  }
+.rightImg {
+  width: 100%;
+  height: 540px;
+}
+.el-carousel__item h3 {
+  color: #475669;
+  font-size: 18px;
+  opacity: 0.75;
+  line-height: 300px;
+  margin: 0;
+}
 
-  .el-carousel__item:nth-child(2n) {
-    background-color: #99a9bf;
-  }
+.el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
 
-  .el-carousel__item:nth-child(2n+1) {
-    background-color: #d3dce6;
-  }
+.el-carousel__item:nth-child(2n + 1) {
+  background-color: #d3dce6;
+}
 
-  .iconfont {
-    margin-right: 10px;
-  }
+.iconfont {
+  margin-right: 10px;
+}
 
-  .toggle-button {
-    background-color: #6495ED;
-    font-size: 10px;
-    line-height: 24px;
-    color: #fff;
-    text-align: center;
-    letter-spacing: 0.2em;
-    cursor: pointer;
-  }
-
+.toggle-button {
+  background-color: #6495ed;
+  font-size: 10px;
+  line-height: 24px;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+}
 </style>
