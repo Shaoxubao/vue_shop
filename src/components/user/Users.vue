@@ -26,7 +26,9 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="addDialogVisible = true">添加用户</el-button>
+          <el-button type="primary" @click="addDialogVisible = true"
+            >添加用户</el-button
+          >
         </el-col>
       </el-row>
       <!--用户列表区域-->
@@ -88,9 +90,16 @@
     <el-dialog
       title="添加用户"
       :visible.sync="addDialogVisible"
-      width="50%">
+      width="50%"
+      @close="addDialogColosed"
+    >
       <!--内容主体-->
-      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px">
+      <el-form
+        :model="addForm"
+        :rules="addFormRules"
+        ref="addFormRef"
+        label-width="70px"
+      >
         <el-form-item label="用户名" prop="username">
           <el-input v-model="addForm.username"></el-input>
         </el-form-item>
@@ -107,7 +116,7 @@
       <!--底部-->
       <span slot="footer" class="dialog-footer">
         <el-button @click="addDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="addUser">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -118,7 +127,8 @@ export default {
   data() {
     // 自定义校验规则：验证邮箱的规则
     var checkEmail = (rule, value, cb) => {
-      const regEmail = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/
+      const regEmail =
+        /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/
       if (regEmail.test(value)) {
         return cb()
       }
@@ -170,11 +180,21 @@ export default {
       addFormRules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 10, message: '用户名长度在3~10个字符之间', trigger: 'blur' }
+          {
+            min: 3,
+            max: 10,
+            message: '用户名长度在3~10个字符之间',
+            trigger: 'blur'
+          }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 6, max: 15, message: '密码长度在6~15个字符之间', trigger: 'blur' }
+          {
+            min: 6,
+            max: 15,
+            message: '密码长度在6~15个字符之间',
+            trigger: 'blur'
+          }
         ],
         email: [
           { required: true, message: '请输入邮箱', trigger: 'blur' },
@@ -224,6 +244,20 @@ export default {
         return this.$message.error('更新用户状态失败.')
       }
       return this.$message.success('更新用户状态成功.')
+    },
+    // 添加用户对话框取消事件，重置对话框
+    addDialogColosed() {
+      this.$refs.addFormRef.resetFields()
+    },
+    // 添加确定
+    addUser() {
+      // 预校验处理
+      this.$refs.addFormRef.validate((valid) => {
+        if (!valid) {
+          return
+        }
+        // 发起添加用户网络请求
+      })
     }
   }
 }
