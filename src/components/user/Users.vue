@@ -252,11 +252,20 @@ export default {
     // 添加确定
     addUser() {
       // 预校验处理
-      this.$refs.addFormRef.validate((valid) => {
+      this.$refs.addFormRef.validate(async (valid) => {
         if (!valid) {
           return
         }
         // 发起添加用户网络请求
+        const { data: res } = await this.$http.post('users', this.addForm)
+        if (res.meta.status !== 201) {
+          return this.$message.error('添加用户失败.')
+        }
+        this.$message.success('添加用户成功.')
+        // 隐藏添加用户对话框
+        this.addDialogVisible = false
+        // 刷新用户列表
+        this.getUserList()
       })
     }
   }
