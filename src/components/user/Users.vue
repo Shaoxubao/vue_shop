@@ -59,6 +59,7 @@
               type="danger"
               icon="el-icon-delete"
               size="mini"
+              @click="removeUserById(scope.row.id)"
             ></el-button>
             <el-tooltip
               effect="dark"
@@ -350,6 +351,32 @@ export default {
         // 提示修改成功
         this.$message.success('更新用户信息成功.')
       })
+    },
+    // 删除用户
+    async removeUserById(id) {
+      // 弹框提示删除
+      const confirmResult = await this.$confirm(
+        '删除该用户, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch((err) => err)
+      // 如果是 确定 操作，confirmResult值是： confirm
+      // 如果是 取消 操作，confirmResult值是： cancel
+      //   console.log(confirmResult)
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('已取消删除')
+      }
+      //   console.log('确认了删除')
+      const { data: res } = await this.$http.delete('users/' + id)
+      if (res.meta.status !== 200) {
+        return this.$message.error('删除用户失败.')
+      }
+      this.$message.success('删除用户成功.')
+      this.getUserList()
     }
   }
 }
