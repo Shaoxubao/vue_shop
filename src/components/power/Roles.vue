@@ -46,6 +46,8 @@
                       type="warning"
                       v-for="item3 in item2.children"
                       :key="item3.id"
+                      closable
+                      @close="removeRightById()"
                       >{{ item3.authName }}</el-tag
                     >
                   </el-col>
@@ -97,6 +99,18 @@ export default {
       }
       this.roleList = res.data
       //   console.log(this.roleList)
+    },
+    // 根据id删除角色拥有的权限
+    async removeRightById() {
+      // 弹框提醒
+      const confirmResult = await this.$confirm('是否继续此权限?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch((err) => err)
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('取消了删除.')
+      }
     }
   }
 }
