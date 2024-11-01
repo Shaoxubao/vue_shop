@@ -26,7 +26,11 @@
             >
               <!--渲染一级权限-->
               <el-col :span="5">
-                <el-tag>{{ item1.authName }}</el-tag>
+                <el-tag
+                  closable
+                  @close="removeRightById(scope.row, item1.id)"
+                  >{{ item1.authName }}</el-tag
+                >
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <!--渲染二级和三级权限-->
@@ -38,7 +42,12 @@
                   :key="item2.id"
                 >
                   <el-col :span="6">
-                    <el-tag type="success">{{ item2.authName }}</el-tag>
+                    <el-tag
+                      type="success"
+                      closable
+                      @close="removeRightById(scope.row, item2.id)"
+                      >{{ item2.authName }}</el-tag
+                    >
                     <i class="el-icon-caret-right"></i>
                   </el-col>
                   <el-col :span="18">
@@ -47,7 +56,7 @@
                       v-for="item3 in item2.children"
                       :key="item3.id"
                       closable
-                      @close="removeRightById()"
+                      @close="removeRightById(scope.row, item3.id)"
                       >{{ item3.authName }}</el-tag
                     >
                   </el-col>
@@ -101,7 +110,7 @@ export default {
       //   console.log(this.roleList)
     },
     // 根据id删除角色拥有的权限
-    async removeRightById() {
+    async removeRightById(role, rightId) {
       // 弹框提醒
       const confirmResult = await this.$confirm('是否继续此权限?', '提示', {
         confirmButtonText: '确定',
@@ -111,6 +120,16 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('取消了删除.')
       }
+      // 调用删除接口
+      const { data: res } = await this.$http.delete(
+        `roles/${role.id}/rights/${rightId}`
+      )
+      if (res.meta.status !== 200) {
+        return this.$message.error('删除权限失败.')
+      }
+      // this.getRoleList()，刷新会重新渲染列表
+      // 返回的data, 是当前角色下最新的权限数据，直接赋给当前role即可，保证删除当前权限后依然是展开状态
+      role.children = res.data
     }
   }
 }
